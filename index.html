@@ -1,203 +1,89 @@
 <!doctype html>
 <html lang="es">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>🤫</title>
-  <style>
-    html, body { height: 100%; margin: 0; background:#000; overflow:hidden; }
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>🤫</title>
 
-    .stage{
-      position:relative; height:100%; width:100%;
-      display:flex; align-items:center; justify-content:center;
-      user-select:none; -webkit-user-select:none;
-      touch-action:manipulation;
-    }
+<style>
+html, body { height:100%; margin:0; background:#000; overflow:hidden; }
 
-    /* Imagen que va creciendo */
-    img{
-      width:min(80vw, 420px);
-      max-width:none;
-      border-radius:14px;
-      transform:scale(1);
-      transition:transform 260ms ease;
-      box-shadow:0 10px 30px rgba(0,0,0,.6);
-    }
+.overlay{
+  position:fixed;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:rgba(0,0,0,.9);
+  font-family:system-ui;
+  color:white;
+}
 
-    /* Overlay final (viewport real móvil) */
-    .overlay{
-      position:fixed;
-      inset:0;
-      width:100vw;
-      height:100vh;
-      display:none;
-      align-items:center;
-      justify-content:center;
-      background:rgba(0,0,0,.85);
-      z-index:9998;
-    }
+.card{
+  text-align:center;
+  width:min(92vw,420px);
+}
 
-    .card{
-      width:min(92vw, 420px);
-      background:rgba(255,255,255,.08);
-      border:1px solid rgba(255,255,255,.18);
-      border-radius:18px;
-      padding:18px;
-      color:#fff;
-      text-align:center;
-      font-family:system-ui, Segoe UI, Arial;
-    }
-    .card h2{ margin:0 0 10px; font-size:20px; }
-    .card p{ margin:0 0 14px; opacity:.9; }
+button{
+  padding:14px 20px;
+  font-size:18px;
+  border:none;
+  border-radius:12px;
+  cursor:pointer;
+  margin:10px;
+  transition:all .3s ease;
+}
 
-    .btns{
-      position:relative;
-      height:72px;
-    }
+#yes{
+  background:#00c853;
+  color:white;
+}
 
-    button{
-      border:0;
-      border-radius:12px;
-      padding:12px 16px;
-      font-weight:700;
-      cursor:pointer;
-      position:absolute;
-      top:0;
-    }
-    #yes{ left:0; }
-    #no{
-      right:0;
-      z-index:9999; /* para que nunca quede debajo */
-    }
-
-    .hint{
-      position:absolute; left:50%; bottom:18px; transform:translateX(-50%);
-      color:#fff; opacity:.75;
-      font-family:system-ui, Segoe UI, Arial;
-      font-size:13px;
-      background:rgba(255,255,255,.08);
-      border:1px solid rgba(255,255,255,.14);
-      padding:8px 10px;
-      border-radius:999px;
-    }
-  </style>
+#no{
+  background:#d50000;
+  color:white;
+}
+</style>
 </head>
+
 <body>
-  <div class="stage" id="stage">
-    <!-- Cambia ESTA imagen por la tuya -->
-    <img id="pic" src="https://picsum.photos/900/1200" alt="foto" />
 
-    <div class="hint" id="hint">Toca la imagen 😇</div>
+<div class="overlay">
+  <div class="card">
+    <h2 id="q">¿Me das un beso? 😘</h2>
 
-    <div class="overlay" id="overlay">
-      <div class="card">
-        <h2 id="q">¿Me das un beso? 😘</h2>
-        <p id="sub">Elige sabiamente…</p>
-
-        <div class="btns">
-          <button id="yes">Sí ✅</button>
-          <button id="no">No ❌</button>
-        </div>
-      </div>
-    </div>
+    <button id="yes">Sí 💚</button>
+    <button id="no">No ❌</button>
   </div>
+</div>
 
-  <script>
-    const img = document.getElementById('pic');
-    const stage = document.getElementById('stage');
-    const overlay = document.getElementById('overlay');
-    const hint = document.getElementById('hint');
-    const yes = document.getElementById('yes');
-    const no = document.getElementById('no');
+<script>
+const yes = document.getElementById("yes");
+const no = document.getElementById("no");
+const q = document.getElementById("q");
 
-    // Config del zoom
-    let scale = 1;
-    const step = 1.22;
-    const maxScale = 6.2;
+let size = 1;
 
-    // 1) Cada tap: zoom
-    stage.addEventListener('click', () => {
-      if (overlay.style.display === 'flex') return;
+no.addEventListener("click", () => {
+  size += 0.5;   // cuánto crece cada vez
+  yes.style.transform = `scale(${size})`;
 
-      hint.style.display = 'none';
-      scale *= step;
-      img.style.transform = `scale(${scale})`;
+  // Cuando ya es enorme
+  if(size >= 6){
+    yes.style.position = "fixed";
+    yes.style.top = "0";
+    yes.style.left = "0";
+    yes.style.width = "100vw";
+    yes.style.height = "100vh";
+    yes.style.transform = "scale(1)";
+    yes.style.borderRadius = "0";
+    yes.style.fontSize = "40px";
 
-      if (scale >= maxScale) {
-        overlay.style.display = 'flex';
-      }
-    });
+    no.style.display = "none";
+    q.textContent = "Sabía que dirías que sí 😏💘";
+  }
+});
+</script>
 
-    // 2) Botón Sí
-    yes.addEventListener('click', () => {
-      document.getElementById('q').textContent = 'Correcto 😏💘';
-      document.getElementById('sub').textContent = 'Ahora ven aquí.';
-      yes.style.display = 'none';
-      no.textContent = 'Cerrar';
-      resetNoPosition();
-    });
-
-    // 3) Botón No troll
-    const trollNo = true;
-
-    no.addEventListener('pointerenter', moverNo);
-    no.addEventListener('touchstart', moverNo, { passive:false });
-
-    function moverNo(e){
-      if (!trollNo) return;
-      if (no.textContent === 'Cerrar') return;
-
-      const pad = 12;
-
-      // viewport REAL visible
-      const vv = window.visualViewport;
-      const vw = vv ? vv.width : window.innerWidth;
-      const vh = vv ? vv.height : window.innerHeight;
-      const ox = vv ? vv.offsetLeft : 0;
-      const oy = vv ? vv.offsetTop : 0;
-
-      const bw = no.offsetWidth;
-      const bh = no.offsetHeight;
-
-      let minX = ox + pad;
-      let maxX = ox + vw - bw - pad;
-      let minY = oy + pad;
-      let maxY = oy + vh - bh - pad;
-
-      if (maxX < minX) maxX = minX;
-      if (maxY < minY) maxY = minY;
-
-      const x = minX + Math.random() * (maxX - minX);
-      const y = minY + Math.random() * (maxY - minY);
-
-      no.style.position = "fixed";
-      no.style.left = `${x}px`;
-      no.style.top  = `${y}px`;
-      no.style.right = "auto";
-      no.style.zIndex = "9999";
-
-      e.preventDefault?.();
-    }
-
-    function resetNoPosition(){
-      no.style.position = 'absolute';
-      no.style.left = 'auto';
-      no.style.top = '0';
-      no.style.right = '0';
-    }
-
-    // 4) Cerrar y reset
-    no.addEventListener('click', () => {
-      if (no.textContent === 'Cerrar') {
-        overlay.style.display = 'none';
-        scale = 1;
-        img.style.transform = 'scale(1)';
-        hint.style.display = 'block';
-        yes.style.display = 'block';
-        no.textContent = 'No ❌';
-        resetNoPosition();
-      }
-    });
-  </script>
 </body>
 </html>
