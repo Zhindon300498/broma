@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="es">
 <head>
@@ -6,6 +7,7 @@
   <title>🤫</title>
   <style>
     html, body { height: 100%; margin: 0; background:#000; overflow:hidden; }
+
     .stage{
       position:relative; height:100%; width:100%;
       display:flex; align-items:center; justify-content:center;
@@ -23,14 +25,18 @@
       box-shadow:0 10px 30px rgba(0,0,0,.6);
     }
 
-    /* Overlay final */
+    /* Overlay final (viewport real móvil) */
     .overlay{
-      position:absolute; inset:0;
+      position:fixed;
+      inset:0;
+      width:100vw;
+      height:100vh;
       display:none;
-      align-items:center; justify-content:center;
-      background:rgba(0,0,0,.75);
-      backdrop-filter: blur(3px);
+      align-items:center;
+      justify-content:center;
+      background:rgba(0,0,0,.85);
     }
+
     .card{
       width:min(92vw, 420px);
       background:rgba(255,255,255,.08);
@@ -44,11 +50,20 @@
     .card h2{ margin:0 0 10px; font-size:20px; }
     .card p{ margin:0 0 14px; opacity:.9; }
 
-    .btns{ position:relative; height:60px; }
+    /* Zona de botones */
+    .btns{
+      position:relative;
+      height:72px; /* un pelín más alto para móvil */
+    }
+
     button{
-      border:0; border-radius:12px; padding:12px 16px;
-      font-weight:700; cursor:pointer;
-      position:absolute; top:0;
+      border:0;
+      border-radius:12px;
+      padding:12px 16px;
+      font-weight:700;
+      cursor:pointer;
+      position:absolute;
+      top:0;
     }
     #yes{ left:0; }
     #no{ right:0; }
@@ -116,48 +131,62 @@
       document.getElementById('q').textContent = 'Correcto 😏💘';
       document.getElementById('sub').textContent = 'Ahora ven aquí.';
       yes.style.display = 'none';
+
       no.textContent = 'Cerrar';
-      no.style.right = '0';
+      // lo devolvemos al sitio por si estaba por ahí volando
+      resetNoPosition();
     });
 
     // 3) Botón No: opción troll (se mueve)
     const trollNo = true; // <- ponlo en false si NO quieres que se mueva
-    no.addEventListener('mouseenter', moverNo);
-    no.addEventListener('touchstart', moverNo);
+
+    // En móvil, "mouseenter" no existe, así que usamos pointerenter + touchstart
+    no.addEventListener('pointerenter', moverNo);
+    no.addEventListener('touchstart', moverNo, { passive:false });
 
     function moverNo(e){
       if (!trollNo) return;
       if (no.textContent === 'Cerrar') return;
 
-      const pad = 10;
-      const w = stage.clientWidth;
-      const h = stage.clientHeight;
+      // Área real visible (viewport)
+      const pad = 12;
       const bw = no.offsetWidth;
       const bh = no.offsetHeight;
 
-      const x = Math.max(pad, Math.random() * (w - bw - pad));
-      const y = Math.max(pad, Math.random() * (h - bh - pad));
+      const maxX = Math.max(pad, window.innerWidth - bw - pad);
+      const maxY = Math.max(pad, window.innerHeight - bh - pad);
 
-      // Lo movemos por la pantalla (queda dentro)
+      const x = pad + Math.random() * (maxX - pad);
+      const y = pad + Math.random() * (maxY - pad);
+
+      // Lo movemos por la pantalla REAL
+      no.style.position = 'fixed';
       no.style.left = `${x}px`;
       no.style.top = `${y}px`;
       no.style.right = 'auto';
+
       e.preventDefault?.();
     }
 
-    // 4) Si es "Cerrar", cierra
+    function resetNoPosition(){
+      no.style.position = 'absolute';
+      no.style.left = 'auto';
+      no.style.top = '0';
+      no.style.right = '0';
+    }
+
+    // 4) Si es "Cerrar", resetea
     no.addEventListener('click', () => {
       if (no.textContent === 'Cerrar') {
-        // reset
         overlay.style.display = 'none';
         scale = 1;
         img.style.transform = 'scale(1)';
         hint.style.display = 'block';
+
         yes.style.display = 'block';
         no.textContent = 'No ❌';
-        no.style.right = '0';
-        no.style.left = 'auto';
-        no.style.top = '0';
+
+        resetNoPosition();
       }
     });
   </script>
