@@ -1,89 +1,216 @@
 <!doctype html>
 <html lang="es">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>🤫</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>🤫</title>
+  <style>
+    html, body { height:100%; margin:0; background:#000; overflow:hidden; }
 
-<style>
-html, body { height:100%; margin:0; background:#000; overflow:hidden; }
+    .stage{
+      position:relative; height:100%; width:100%;
+      display:flex; align-items:center; justify-content:center;
+      user-select:none; -webkit-user-select:none;
+      touch-action:manipulation;
+    }
 
-.overlay{
-  position:fixed;
-  inset:0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background:rgba(0,0,0,.9);
-  font-family:system-ui;
-  color:white;
-}
+    img{
+      width:min(80vw, 420px);
+      max-width:none;
+      border-radius:14px;
+      transform:scale(1);
+      transition:transform 260ms ease;
+      box-shadow:0 10px 30px rgba(0,0,0,.6);
+    }
 
-.card{
-  text-align:center;
-  width:min(92vw,420px);
-}
+    .overlay{
+      position:fixed;
+      inset:0;
+      width:100vw;
+      height:100vh;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      background:rgba(0,0,0,.85);
+      z-index:9998;
+      font-family:system-ui, Segoe UI, Arial;
+      color:#fff;
+    }
 
-button{
-  padding:14px 20px;
-  font-size:18px;
-  border:none;
-  border-radius:12px;
-  cursor:pointer;
-  margin:10px;
-  transition:all .3s ease;
-}
+    .card{
+      width:min(92vw, 420px);
+      background:rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.18);
+      border-radius:18px;
+      padding:18px;
+      text-align:center;
+      box-shadow:0 10px 30px rgba(0,0,0,.55);
+    }
 
-#yes{
-  background:#00c853;
-  color:white;
-}
+    .card h2{ margin:0 0 10px; font-size:20px; }
+    .card p{ margin:0 0 14px; opacity:.9; }
 
-#no{
-  background:#d50000;
-  color:white;
-}
-</style>
+    .btns{ position:relative; height:72px; }
+
+    button{
+      border:0;
+      border-radius:12px;
+      padding:12px 16px;
+      font-weight:800;
+      cursor:pointer;
+      position:absolute;
+      top:0;
+      transition: transform 220ms ease, width 220ms ease, height 220ms ease, border-radius 220ms ease, font-size 220ms ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    #yes{
+      left:0;
+      background:#00c853;
+      color:#fff;
+      z-index:9999;
+      transform:scale(1);
+      transform-origin:left top;
+    }
+
+    #no{
+      right:0;
+      background:#d50000;
+      color:#fff;
+      z-index:9999;
+    }
+
+    .hint{
+      position:absolute; left:50%; bottom:18px; transform:translateX(-50%);
+      color:#fff; opacity:.75;
+      font-family:system-ui, Segoe UI, Arial;
+      font-size:13px;
+      background:rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.14);
+      padding:8px 10px;
+      border-radius:999px;
+    }
+
+    /* fullscreen del SÍ */
+    .yes-fullscreen{
+      position:fixed !important;
+      left:0 !important;
+      top:0 !important;
+      width:100vw !important;
+      height:100vh !important;
+      border-radius:0 !important;
+      font-size:42px !important;
+      transform:none !important;
+    }
+  </style>
 </head>
 
 <body>
+  <div class="stage" id="stage">
+    <img id="pic" src="https://picsum.photos/900/1200" alt="foto" />
+    <div class="hint" id="hint">Toca la imagen 😇</div>
 
-<div class="overlay">
-  <div class="card">
-    <h2 id="q">¿Me das un beso? 😘</h2>
+    <div class="overlay" id="overlay">
+      <div class="card">
+        <h2 id="q">¿Me das un beso? 😘</h2>
+        <p id="sub">Pulsa “No” si te atreves…</p>
 
-    <button id="yes">Sí 💚</button>
-    <button id="no">No ❌</button>
+        <div class="btns">
+          <button id="yes">Sí ✅</button>
+          <button id="no">No ❌</button>
+        </div>
+      </div>
+    </div>
   </div>
-</div>
 
-<script>
-const yes = document.getElementById("yes");
-const no = document.getElementById("no");
-const q = document.getElementById("q");
+  <script>
+    const img = document.getElementById('pic');
+    const stage = document.getElementById('stage');
+    const overlay = document.getElementById('overlay');
+    const hint = document.getElementById('hint');
+    const yes = document.getElementById('yes');
+    const no = document.getElementById('no');
+    const q = document.getElementById('q');
+    const sub = document.getElementById('sub');
 
-let size = 1;
+    // Zoom para llegar al overlay
+    let scaleImg = 1;
+    const stepImg = 1.22;
+    const maxScaleImg = 6.2;
 
-no.addEventListener("click", () => {
-  size += 0.5;   // cuánto crece cada vez
-  yes.style.transform = `scale(${size})`;
+    stage.addEventListener('click', () => {
+      if (overlay.style.display === 'flex') return;
+      hint.style.display = 'none';
+      scaleImg *= stepImg;
+      img.style.transform = `scale(${scaleImg})`;
+      if (scaleImg >= maxScaleImg) overlay.style.display = 'flex';
+    });
 
-  // Cuando ya es enorme
-  if(size >= 6){
-    yes.style.position = "fixed";
-    yes.style.top = "0";
-    yes.style.left = "0";
-    yes.style.width = "100vw";
-    yes.style.height = "100vh";
-    yes.style.transform = "scale(1)";
-    yes.style.borderRadius = "0";
-    yes.style.fontSize = "40px";
+    // Crecimiento del SÍ cuando le das a NO
+    let yesScale = 1;
+    const yesStep = 0.30;     // cuánto crece por click en NO
+    const yesMax = 4.2;       // cuando llega aquí, pantalla completa
+    const moverNoTrasClick = false; // pon true si además quieres que se mueva DESPUÉS del click
 
-    no.style.display = "none";
-    q.textContent = "Sabía que dirías que sí 😏💘";
-  }
-});
-</script>
+    no.addEventListener('click', (e) => {
+      // 1) crece SÍ
+      yesScale += yesStep;
+      yes.style.transform = `scale(${yesScale})`;
 
+      // 2) feedback
+      if (navigator.vibrate) navigator.vibrate(25);
+
+      // 3) opcional: mover NO pero SOLO después de click
+      if (moverNoTrasClick) moverNo();
+
+      // 4) si ya es enorme: fullscreen
+      if (yesScale >= yesMax) {
+        yes.classList.add('yes-fullscreen');
+        no.style.display = 'none';
+        q.textContent = 'Sabía que ibas a decir que sí 😏💘';
+        sub.textContent = 'Acércate a reclamarlo.';
+        yes.textContent = 'SÍ ✅';
+      }
+    });
+
+    // Si le dan al Sí
+    yes.addEventListener('click', () => {
+      q.textContent = 'Correcto 😌💘';
+      sub.textContent = 'Beso desbloqueado. Reclámalo en persona.';
+      yes.classList.add('yes-fullscreen');
+      no.style.display = 'none';
+      yes.textContent = 'SÍ ✅';
+    });
+
+    // mover NO dentro del viewport (solo si activar moverNoTrasClick = true)
+    function moverNo(){
+      const pad = 12;
+      const vv = window.visualViewport;
+      const vw = vv ? vv.width : window.innerWidth;
+      const vh = vv ? vv.height : window.innerHeight;
+      const ox = vv ? vv.offsetLeft : 0;
+      const oy = vv ? vv.offsetTop : 0;
+
+      const bw = no.offsetWidth;
+      const bh = no.offsetHeight;
+
+      let minX = ox + pad;
+      let maxX = ox + vw - bw - pad;
+      let minY = oy + pad;
+      let maxY = oy + vh - bh - pad;
+
+      if (maxX < minX) maxX = minX;
+      if (maxY < minY) maxY = minY;
+
+      const x = minX + Math.random() * (maxX - minX);
+      const y = minY + Math.random() * (maxY - minY);
+
+      no.style.position = "fixed";
+      no.style.left = `${x}px`;
+      no.style.top  = `${y}px`;
+      no.style.right = "auto";
+      no.style.zIndex = "9999";
+    }
+  </script>
 </body>
 </html>
