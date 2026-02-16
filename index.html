@@ -1,232 +1,165 @@
 <!doctype html>
 <html lang="es">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>🤫</title>
-  <style>
-    html, body { height:100%; margin:0; background:#000; overflow:hidden; }
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>🤫</title>
 
-    .stage{
-      position:relative; height:100%; width:100%;
-      display:flex; align-items:center; justify-content:center;
-      user-select:none; -webkit-user-select:none;
-      touch-action:manipulation;
-    }
+<style>
+html, body {
+  height:100%;
+  margin:0;
+  background:#000;
+  overflow:hidden;
+  font-family:system-ui, Segoe UI, Arial;
+}
 
-    img{
-      width:min(80vw, 420px);
-      max-width:none;
-      border-radius:14px;
-      transform:scale(1);
-      transition:transform 260ms ease;
-      box-shadow:0 10px 30px rgba(0,0,0,.6);
-    }
+/* Imagen inicial */
+.stage{
+  position:relative;
+  height:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
 
-    .overlay{
-      position:fixed;
-      inset:0;
-      width:100vw;
-      height:100vh;
-      display:none;
-      align-items:center;
-      justify-content:center;
-      background:rgba(0,0,0,.85);
-      z-index:9998;
-      font-family:system-ui, Segoe UI, Arial;
-      color:#fff;
-    }
+img{
+  width:min(80vw, 420px);
+  border-radius:14px;
+  transform:scale(1);
+  transition:transform 0.3s ease;
+}
 
-    .card{
-      width:min(92vw, 420px);
-      background:rgba(255,255,255,.08);
-      border:1px solid rgba(255,255,255,.18);
-      border-radius:18px;
-      padding:18px;
-      text-align:center;
-      box-shadow:0 10px 30px rgba(0,0,0,.55);
-    }
+/* Overlay */
+.overlay{
+  position:fixed;
+  inset:0;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  background:rgba(0,0,0,0.9);
+  color:white;
+  z-index:999;
+}
 
-    .card h2{ margin:0 0 10px; font-size:20px; }
-    .card p{ margin:0 0 14px; opacity:.9; }
+.card{
+  text-align:center;
+  width:min(92vw, 420px);
+}
 
-    .btns{ position:relative; height:72px; }
+button{
+  padding:14px 20px;
+  font-size:18px;
+  border:none;
+  border-radius:12px;
+  cursor:pointer;
+  margin:10px;
+  transition:all 0.3s ease;
+}
 
-    button{
-      border:0;
-      border-radius:12px;
-      padding:12px 16px;
-      font-weight:800;
-      cursor:pointer;
-      position:absolute;
-      top:0;
-      transition: transform 220ms ease, width 220ms ease, height 220ms ease, border-radius 220ms ease, font-size 220ms ease;
-      -webkit-tap-highlight-color: transparent;
-    }
+#yes{
+  background:#00c853;
+  color:white;
+  transform:scale(1);
+  transform-origin:left top;
+}
 
-    #yes{
-      left:0;
-      background:#00c853;
-      color:#fff;
-      z-index:9999;
-      transform:scale(1);
-      transform-origin:left top;
-    }
+#no{
+  background:#d50000;
+  color:white;
+}
 
-    #no{
-      right:0;
-      background:#d50000;
-      color:#fff;
-      z-index:9999;
-    }
-
-    .hint{
-      position:absolute; left:50%; bottom:18px; transform:translateX(-50%);
-      color:#fff; opacity:.75;
-      font-family:system-ui, Segoe UI, Arial;
-      font-size:13px;
-      background:rgba(255,255,255,.08);
-      border:1px solid rgba(255,255,255,.14);
-      padding:8px 10px;
-      border-radius:999px;
-    }
-
-    /* fullscreen del SÍ */
-    .yes-fullscreen{
-      position:fixed !important;
-      left:0 !important;
-      top:0 !important;
-      width:100vw !important;
-      height:100vh !important;
-      border-radius:0 !important;
-      font-size:42px !important;
-      transform:none !important;
-    }
-  </style>
+.yes-fullscreen{
+  position:fixed !important;
+  top:0 !important;
+  left:0 !important;
+  width:100vw !important;
+  height:100vh !important;
+  border-radius:0 !important;
+  font-size:40px !important;
+  transform:none !important;
+  z-index:9999 !important;
+}
+</style>
 </head>
 
 <body>
-  <div class="stage" id="stage">
-    <img id="pic" src="https://picsum.photos/900/1200" alt="foto" />
-    <div class="hint" id="hint">Toca la imagen 😇</div>
 
-    <div class="overlay" id="overlay">
-      <div class="card">
-        <h2 id="q">¿Me das un beso? 😘</h2>
-        <p id="sub">Pulsa “No” si te atreves…</p>
+<div class="stage" id="stage">
+  <img id="pic" src="https://picsum.photos/900/1200" />
+</div>
 
-        <div class="btns">
-          <button id="yes">Sí ✅</button>
-          <button id="no">No ❌</button>
-        </div>
-      </div>
-    </div>
+<div class="overlay" id="overlay">
+  <div class="card">
+    <h2 id="q">¿Me das un beso? 😘</h2>
+    <p id="sub">Elige sabiamente…</p>
+    <button id="yes">Sí 💚</button>
+    <button id="no">No ❌</button>
   </div>
+</div>
 
-  <script>
-    const img = document.getElementById('pic');
-    const stage = document.getElementById('stage');
-    const overlay = document.getElementById('overlay');
-    const hint = document.getElementById('hint');
-    const yes = document.getElementById('yes');
-    const no = document.getElementById('no');
-    const q = document.getElementById('q');
-    const sub = document.getElementById('sub');
+<script>
+const img = document.getElementById("pic");
+const stage = document.getElementById("stage");
+const overlay = document.getElementById("overlay");
+const yes = document.getElementById("yes");
+const no = document.getElementById("no");
+const q = document.getElementById("q");
+const sub = document.getElementById("sub");
 
-    // Zoom para llegar al overlay
-    let scaleImg = 1;
-    const stepImg = 1.22;
-    const maxScaleImg = 6.2;
+/* ZOOM INICIAL */
+let zoom = 1;
+const zoomStep = 1.2;
+const zoomMax = 6;
 
-    stage.addEventListener('click', () => {
-      if (overlay.style.display === 'flex') return;
-      hint.style.display = 'none';
-      scaleImg *= stepImg;
-      img.style.transform = `scale(${scaleImg})`;
-      if (scaleImg >= maxScaleImg) overlay.style.display = 'flex';
-    });
+stage.addEventListener("click", () => {
+  if (overlay.style.display === "flex") return;
 
-    // Crecimiento del SÍ cuando le das a NO
-    let yesScale = 1;
-    const yesStep = 0.30;     // cuánto crece por click en NO
-    const yesMax = 4.2;       // cuando llega aquí, pantalla completa
-    const moverNoTrasClick = false; // pon true si además quieres que se mueva DESPUÉS del click
+  zoom *= zoomStep;
+  img.style.transform = `scale(${zoom})`;
 
-    no.addEventListener('click', (e) => {
-      // 1) crece SÍ
-      yesScale += yesStep;
-      yes.style.transform = `scale(${yesScale})`;
+  if (zoom >= zoomMax) {
+    overlay.style.display = "flex";
+  }
+});
 
-      // 2) feedback
-      if (navigator.vibrate) navigator.vibrate(25);
+/* CRECIMIENTO DEL SÍ */
+let yesScale = 1;
+const yesStep = 0.4;
+const yesMax = 4;
 
-      // 3) opcional: mover NO pero SOLO después de click
-      if (moverNoTrasClick) moverNo();
+no.addEventListener("click", () => {
 
-      // 4) si ya es enorme: fullscreen
-      if (yesScale >= yesMax) {
-        yes.classList.add('yes-fullscreen');
-        no.style.display = 'none';
-        q.textContent = 'Sabía que ibas a decir que sí 😏💘';
-        sub.textContent = 'Acércate a reclamarlo.';
-        yes.textContent = 'SÍ ✅';
-      }
-    });
+  yesScale += yesStep;
+  yes.style.transform = `scale(${yesScale})`;
 
-    // Si le dan al Sí
-   yes.addEventListener('click', () => {
+  if (navigator.vibrate) navigator.vibrate(25);
 
-      // Oculta el NO
-      no.style.display = 'none';
-    
-      // Pantalla completa
-      yes.classList.add('yes-fullscreen');
-    
-      // Cambia textos
-      q.textContent = 'Sabía que dirías que sí 😏💘';
-      sub.textContent = 'Ahora ven aquí inmediatamente.';
-    
-      // Cambia texto del botón
-      yes.textContent = 'BESO ACTIVADO 💋';
-    
-      // Fondo cambia de color
-      document.body.style.background = '#111';
-      overlay.style.background = 'radial-gradient(circle, #ff4081, #000)';
-    
-      // Vibración en móvil
-      if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
-    
-    });
+  if (yesScale >= yesMax) {
+    activarFinal();
+  }
+});
 
-    // mover NO dentro del viewport (solo si activar moverNoTrasClick = true)
-    function moverNo(){
-      const pad = 12;
-      const vv = window.visualViewport;
-      const vw = vv ? vv.width : window.innerWidth;
-      const vh = vv ? vv.height : window.innerHeight;
-      const ox = vv ? vv.offsetLeft : 0;
-      const oy = vv ? vv.offsetTop : 0;
+/* BOTÓN SÍ */
+yes.addEventListener("click", () => {
+  activarFinal();
+});
 
-      const bw = no.offsetWidth;
-      const bh = no.offsetHeight;
+function activarFinal() {
 
-      let minX = ox + pad;
-      let maxX = ox + vw - bw - pad;
-      let minY = oy + pad;
-      let maxY = oy + vh - bh - pad;
+  no.style.display = "none";
+  yes.classList.add("yes-fullscreen");
 
-      if (maxX < minX) maxX = minX;
-      if (maxY < minY) maxY = minY;
+  q.textContent = "Sabía que dirías que sí 😏💘";
+  sub.textContent = "Ahora ven aquí inmediatamente.";
+  yes.textContent = "BESO ACTIVADO 💋";
 
-      const x = minX + Math.random() * (maxX - minX);
-      const y = minY + Math.random() * (maxY - minY);
+  document.body.style.background = "#111";
+  overlay.style.background = "radial-gradient(circle, #ff4081, #000)";
 
-      no.style.position = "fixed";
-      no.style.left = `${x}px`;
-      no.style.top  = `${y}px`;
-      no.style.right = "auto";
-      no.style.zIndex = "9999";
-    }
-  </script>
+  if (navigator.vibrate) navigator.vibrate([100,50,100]);
+}
+</script>
+
 </body>
 </html>
