@@ -174,12 +174,28 @@
     });
 
     // Si le dan al Sí
-    yes.addEventListener('click', () => {
-      q.textContent = 'Correcto 😌💘';
-      sub.textContent = 'Beso desbloqueado. Reclámalo en persona.';
-      yes.classList.add('yes-fullscreen');
+   yes.addEventListener('click', () => {
+
+      // Oculta el NO
       no.style.display = 'none';
-      yes.textContent = 'SÍ ✅';
+    
+      // Pantalla completa
+      yes.classList.add('yes-fullscreen');
+    
+      // Cambia textos
+      q.textContent = 'Sabía que dirías que sí 😏💘';
+      sub.textContent = 'Ahora ven aquí inmediatamente.';
+    
+      // Cambia texto del botón
+      yes.textContent = 'BESO ACTIVADO 💋';
+    
+      // Fondo cambia de color
+      document.body.style.background = '#111';
+      overlay.style.background = 'radial-gradient(circle, #ff4081, #000)';
+    
+      // Vibración en móvil
+      if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+    
     });
 
     // mover NO dentro del viewport (solo si activar moverNoTrasClick = true)
